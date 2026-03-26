@@ -1,282 +1,150 @@
-# 🔍 Nmap Lab 2 — Port Scanning & Nmap Scripting Engine (NSE)
+# 🔍 Nmap Lab 2 — Port Scanning & NSE (Using scanme.nmap.org)
 
 ## 🎯 Objective
 
-In this lab, we will go deeper into Nmap by focusing on two important areas:
+This lab focuses on performing meaningful Nmap scans using a real and responsive target. The goal is to:
 
-* Understanding different types of port scanning techniques
-* Using the Nmap Scripting Engine (NSE) to extract more detailed information from a target
-
-By the end of this lab, you should be comfortable identifying open ports and using scripts to gather useful intelligence.
+* Identify open ports
+* Detect running services
+* Use NSE scripts to gather additional information
 
 ---
 
 ## 🛠️ Prerequisites
 
-Before starting, ensure you have the following:
+* Kali Linux / Linux system
+* Nmap installed
+* Internet connection
 
-* Kali Linux or any Linux distribution with Nmap installed
-* Basic understanding of networking concepts
-* A safe target environment
+### 🎯 Target Used
 
-### 🎯 Target IPs (Use one of these)
+```
+scanme.nmap.org
+```
 
-* Local Lab Machine: `192.168.1.10`
-* Official Test Server: `scanme.nmap.org`
-
-⚠️ Important: Only scan systems you have permission to test.
+⚠️ Note: This is an official test server provided for learning purposes. Some scans may be limited or filtered.
 
 ---
 
-# 📌 Task 1 — Basic Port Scan
-
-### Command:
+# 📌 Task 1 — Basic Scan
 
 ```bash
-nmap 192.168.1.10
+nmap scanme.nmap.org
 ```
 
 ### Explanation:
 
-This is the default scan performed by Nmap. It scans the top 1000 most commonly used ports on the target system.
+Performs a default scan on the top 1000 ports.
 
-### What to Observe:
+### Observation:
 
-* List of open ports
-* Services running on those ports
-* Port states such as open, closed, or filtered
+* Identify open ports (commonly 22, 80)
+* Note port states (open/filtered)
 
 ---
 
-# 📌 Task 2 — Scan Specific Ports
-
-### Command:
+# 📌 Task 2 — Service Version Detection
 
 ```bash
-nmap -p 22,80,443 192.168.1.10
+nmap -sV scanme.nmap.org
 ```
 
 ### Explanation:
 
-This command scans only selected ports instead of scanning all common ports. It is useful when you want to focus on specific services.
+Detects service versions running on open ports.
 
-### What to Observe:
+### Observation:
 
-* Whether the selected ports are open or closed
-* Which services are active on those ports
+* Service names and versions
+* Additional details about services
 
 ---
 
-# 📌 Task 3 — Scan a Range of Ports
-
-### Command:
+# 📌 Task 3 — SYN Scan (Stealth)
 
 ```bash
-nmap -p 1-1000 192.168.1.10
+sudo nmap -sS scanme.nmap.org
 ```
 
 ### Explanation:
 
-This scans a continuous range of ports. It provides more coverage than the default scan and may reveal additional services.
+Performs a stealth scan without completing full TCP handshake.
 
-### What to Observe:
+### Observation:
 
-* Additional open ports not found in default scan
-* Differences compared to Task 1
+* Compare results with basic scan
+* Note speed and behavior differences
 
 ---
 
-# 📌 Task 4 — Scan All Ports
-
-### Command:
+# 📌 Task 4 — Specific Ports Scan
 
 ```bash
-nmap -p- 192.168.1.10
+nmap -p 22,80,443 scanme.nmap.org
 ```
 
 ### Explanation:
 
-This command scans all 65535 ports on the target system. It is the most thorough scan but takes more time.
+Scans only selected ports.
 
-### What to Observe:
+### Observation:
 
-* Any uncommon or hidden services
-* Time taken compared to other scans
+* Confirm which ports are open
+* Identify services on those ports
 
 ---
 
-# 📌 Task 5 — Fast Scan
-
-### Command:
+# 📌 Task 5 — NSE Default Scripts
 
 ```bash
-nmap -F 192.168.1.10
+nmap -sC scanme.nmap.org
 ```
 
 ### Explanation:
 
-This performs a faster scan by scanning fewer ports than the default scan.
+Runs default safe scripts for enumeration.
 
-### What to Observe:
+### Observation:
 
-* Reduced scan time
-* Possible missing ports compared to full scans
+* Additional service details
+* Script outputs
 
 ---
 
-# 📌 Task 6 — TCP SYN Scan (Stealth Scan)
-
-### Command:
+# 📌 Task 6 — NSE HTTP Script
 
 ```bash
-sudo nmap -sS 192.168.1.10
+nmap --script=http-title scanme.nmap.org
 ```
 
 ### Explanation:
 
-This is known as a stealth scan because it does not complete the full TCP handshake. It is faster and less likely to be logged.
+Retrieves the title of the web page.
 
-### What to Observe:
-
-* Similar results to basic scan
-* Faster execution
-
----
-
-# 📌 Task 7 — UDP Scan
-
-### Command:
-
-```bash
-sudo nmap -sU 192.168.1.10
-```
-
-### Explanation:
-
-UDP scans check for services running on UDP ports such as DNS or SNMP. These scans are slower and sometimes less reliable.
-
-### What to Observe:
-
-* Open or filtered UDP ports
-* Differences compared to TCP scan results
-
----
-
-# 🔍 Nmap Scripting Engine (NSE)
-
-## 📌 Task 8 — Default Scripts
-
-### Command:
-
-```bash
-nmap -sC 192.168.1.10
-```
-
-### Explanation:
-
-This runs a set of default scripts that are safe and useful for basic enumeration.
-
-### What to Observe:
-
-* Additional information about services
-* Script outputs providing extra details
-
----
-
-## 📌 Task 9 — Run a Specific Script
-
-### Command:
-
-```bash
-nmap --script=http-title 192.168.1.10
-```
-
-### Explanation:
-
-This script retrieves the title of a web page hosted on the target.
-
-### What to Observe:
+### Observation:
 
 * Web application title
-* Any useful identifying information
-
----
-
-## 📌 Task 10 — Run Multiple Scripts
-
-### Command:
-
-```bash
-nmap --script=http-* 192.168.1.10
-```
-
-### Explanation:
-
-This runs all scripts related to HTTP services.
-
-### What to Observe:
-
-* Detailed HTTP information
-* Server configuration insights
-
----
-
-## 📌 Task 11 — Vulnerability Scan
-
-### Command:
-
-```bash
-nmap --script=vuln 192.168.1.10
-```
-
-### Explanation:
-
-This attempts to detect known vulnerabilities using available NSE scripts.
-
-### What to Observe:
-
-* Reported vulnerabilities
-* False positives (not always accurate)
-
----
-
-## 📌 Task 12 — Service Version + Scripts
-
-### Command:
-
-```bash
-nmap -sV --script=default 192.168.1.10
-```
-
-### Explanation:
-
-This combines service version detection with default scripts to provide deeper insights.
-
-### What to Observe:
-
-* Service versions
-* Additional script-based information
+* Useful identifying information
 
 ---
 
 # 📊 Final Observations
 
-After completing all tasks, you should be able to:
-
-* Identify open ports and running services
-* Understand differences between scan types
-* Use NSE for deeper enumeration
-
----
-
-# 🧠 Lab Summary
-
-Port scanning helps identify potential entry points in a system, while NSE enhances scanning by providing detailed information and possible vulnerabilities. Together, they form a critical part of reconnaissance in cybersecurity.
+* Open ports indicate active services
+* Service detection provides deeper insights
+* NSE enhances scanning with additional information
+* Results may vary due to server restrictions
 
 ---
 
-# 📌 Notes
+# 🧠 Conclusion
 
-* Always perform scans in a legal and authorized environment
-* Full scans can take significant time
-* NSE vulnerability results should always be verified manually
+This lab demonstrates how to perform practical port scanning and basic enumeration using a real-world test server. It highlights the importance of choosing the right target for meaningful results.
+
+---
+
+# ⚠️ Notes
+
+* Avoid aggressive scans on public targets
+* Results may be limited due to security controls
+* Always scan authorized systems only
